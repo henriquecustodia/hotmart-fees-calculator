@@ -8,121 +8,85 @@ import { debounce, debounceTime } from "rxjs";
   selector: "app-root",
   standalone: true,
   imports: [ReactiveFormsModule, CurrencyPipe],
-  template: `
-    <h1>Calcular preço final de curso na Hotmart</h1>
+  styles: [
+    `
 
-    <fieldset>
-      <h3>Taxas</h3>
-
-      <div>
-        <input
-          type="number"
-          [formControl]="taxaParcelamentoEm12x"
-          placeholder="taxa para parcelar em 12x"
-        />%
-      </div>
-
-      <div>
-        <input
-          type="number"
-          [formControl]="taxaIntermediacao"
-          placeholder="taxa de intermediação"
-        />%
-      </div>
-
-      <div>
-        R$<input
-          type="number"
-          [formControl]="taxaLicenca"
-          placeholder="taxa de licença"
-        />
-      </div>
-
-      <div>
-        R$<input
-          type="number"
-          [formControl]="taxaPlayerUnico"
-          placeholder="player de pagamento único"
-        />
-      </div>
-    </fieldset>
-
-    <br />
-
-    <fieldset>
-      <div>
-        <div>
-          <label for="valorCobradoParceladoEm12x"
-            >Valor cobrado parcelado em 12x</label
-          >
-        </div>
-        R$<input
-          id="valorCobradoParceladoEm12x"
-          type="number"
-          [formControl]="valorFinalParceladoEm12px"
-          placeholder="valor final parcelado em 12x"
-        />
-      </div>
-    </fieldset>
-
-    <br>
-
-    <div>
-      Total líquido a receber: {{ valorLiquidoRecebido() | currency : "BRL" }}
-    </div>
-    <div>Total a ser cobrado: {{ valorCobrado() | currency : "BRL" }}</div>
-  `,
-  styles: [],
+    `
+  ],
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  valorCobrado = signal(0);
-  valorLiquidoRecebido = signal(0);
+  valorLiquidoRecebidoEm12x = signal(0);
+  valorLiquidoRecebidoAVista = signal(0);
+  valorDeCadaParcela = signal(0);
+  valorCobradoMenosDesconto = signal(0);
 
-  valorFinalParceladoEm12px = new FormControl(0, { nonNullable: true });
-  taxaParcelamentoEm12x = new FormControl(16.5, { nonNullable: true });
-  taxaIntermediacao = new FormControl(9.9, { nonNullable: true });
-  taxaLicenca = new FormControl(1, { nonNullable: true });
-  taxaPlayerUnico = new FormControl(2.49, { nonNullable: true });
+  valorCobradoControl = new FormControl(0, { nonNullable: true });
+  valorDescontoControl = new FormControl(0, { nonNullable: true });
+
+  taxaParcelamentoEm12xControl = new FormControl(16.5, { nonNullable: true });
+  taxaIntermediacaoControl = new FormControl(9.9, { nonNullable: true });
+  taxaLicencaControl = new FormControl(1, { nonNullable: true });
+  taxaPlayerUnicoControl = new FormControl(2.49, { nonNullable: true });
 
   constructor() {
-    this.valorFinalParceladoEm12px.valueChanges.pipe(debounceTime(500)).subscribe(() => {
-      this.calcular();
-    })
+    [
+      this.valorCobradoControl.valueChanges,
+      this.valorDescontoControl.valueChanges,
+    ].forEach((changes) =>
+      changes.pipe(debounceTime(500)).subscribe(() => {
+        this.calcular();
+      })
+    );
   }
 
   calcular() {
-    const valorFinalParceladoEm12px = this.valorFinalParceladoEm12px.value;
-    const taxaParcelamentoEm12x = this.taxaParcelamentoEm12x.value;
-    const taxaIntermediacao = this.taxaIntermediacao.value;
-    const taxaLicenca = this.taxaLicenca.value;
-    const taxaPlayerUnico = this.taxaPlayerUnico.value;
+    let total = this.valorCobradoControl.value;
 
-    const totalMulplicadoEm12x = valorFinalParceladoEm12px * 12;
-    const totalDescontadoTaxaParcelamento =
-      totalMulplicadoEm12x * (1 - taxaParcelamentoEm12x / 100);
-    const totalDescontadoTaxaIntermediação =
-      totalDescontadoTaxaParcelamento * (1 - taxaIntermediacao / 100);
-    const totalDescontadoTaxaLicenca =
-      totalDescontadoTaxaIntermediação - taxaLicenca;
-    const totalDescontadoTaxaPlayerUnico =
-      totalDescontadoTaxaLicenca - taxaPlayerUnico;
+    const valorDescontoAVista = this.valorDescontoControl.value;
 
-    console.log("totalMulplicadoEm12x", totalMulplicadoEm12x);
-    console.log(
-      "totalDescontadoTaxaParcelamento",
-      totalDescontadoTaxaParcelamento
-    );
-    console.log(
-      "totalDescontadoTaxaIntermediação",
-      totalDescontadoTaxaIntermediação
-    );
-    console.log("totalDescontadoTaxaLicenca", totalDescontadoTaxaLicenca);
-    console.log(
-      "totalDescontadoTaxaPlayerUnico",
-      totalDescontadoTaxaPlayerUnico
-    );
+    if (valorDescontoAVista > 0) {
+      total = total * (1 - valorDescontoAVista / 100);
+    }
 
-    this.valorLiquidoRecebido.set(totalDescontadoTaxaPlayerUnico);
-    this.valorCobrado.set(totalMulplicadoEm12x);
+    this.valorCobradoMenosDesconto.set(total);
+
+    this.calcularParcelamentoEm12x(total);
+    this.calcularValorAVista(total);
+  }
+
+  calcularParcelamentoEm12x(valorCobrado: number) {
+    const taxaParcelamentoEm12x = this.taxaParcelamentoEm12xControl.value;
+    
+    this.valorDeCadaParcela.set(valorCobrado / 12);
+
+    let total = valorCobrado;
+
+    total = total * (1 - taxaParcelamentoEm12x / 100);
+
+    total = this.calcularTaxasDaHotmart(total);
+
+    this.valorLiquidoRecebidoEm12x.set(total);
+  }
+
+  calcularValorAVista(valorCobrado: number) {
+    let total = valorCobrado;
+
+    total = this.calcularTaxasDaHotmart(total);
+
+    this.valorLiquidoRecebidoAVista.set(total);
+  }
+
+  private calcularTaxasDaHotmart(valor: number) {
+    const taxaIntermediacao = this.taxaIntermediacaoControl.value;
+    const taxaLicenca = this.taxaLicencaControl.value;
+    const taxaPlayerUnico = this.taxaPlayerUnicoControl.value;
+
+    valor = valor * (1 - taxaIntermediacao / 100);
+    valor = valor - taxaLicenca;
+    valor = valor - taxaPlayerUnico;
+
+    return valor;
   }
 }

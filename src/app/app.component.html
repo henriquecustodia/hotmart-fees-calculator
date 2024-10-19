@@ -1,0 +1,120 @@
+<div class="layout">
+  <h1>Precificar curso na Hotmart</h1>
+
+  <div class="container">
+    <div class="container-item">
+      <fieldset>
+        <div>
+          <div>
+            <label for="valorCobradoControl">Valor cobrado</label>
+          </div>
+          R$<input
+            id="valorCobradoControl"
+            type="number"
+            [formControl]="valorCobradoControl"
+          />
+        </div>
+
+        <br />
+
+        <div>
+          <div>
+            <label for="valorDescontoControl">Valor desconto</label>
+          </div>
+          <input
+            id="valorDescontoControl"
+            type="number"
+            [formControl]="valorDescontoControl"
+          />%
+        </div>
+      </fieldset>
+
+      <br />
+
+      <div>
+        Total a ser cobrado: {{ valorCobradoControl.value | currency : "BRL" }}
+      </div>
+
+      <div>Total desconto: {{ valorDescontoControl.value }}%</div>
+
+      <br />
+
+      <div>
+        Total cobrado com desconto:
+        {{ valorCobradoMenosDesconto() | currency : "BRL" }}
+      </div>
+
+      <div>
+        Valor de cada parcela em 12x:
+        {{ valorDeCadaParcela() | currency : "BRL" }}
+      </div>
+
+      <br />
+
+      <div>
+        Total líquido a receber à vista:
+        {{ valorLiquidoRecebidoAVista() | currency : "BRL" }}
+      </div>
+
+      <div>
+        Total líquido a receber parcelado em 12x:
+        {{ valorLiquidoRecebidoEm12x() | currency : "BRL" }}
+      </div>
+    </div>
+
+    <fieldset class="container-item">
+      <div>
+        <div>
+          <label for="taxaParcelamentoEm12x">Taxa de parcelamento em 12x</label>
+        </div>
+        <input
+          id="taxaParcelamentoEm12x"
+          type="number"
+          [formControl]="taxaParcelamentoEm12xControl"
+        />%
+      </div>
+
+      <br />
+
+      <div>
+        <div>
+          <label for="taxaIntermediacao">Taxa de intermediação</label>
+        </div>
+        <input
+          id="taxaIntermediacao"
+          type="number"
+          [formControl]="taxaIntermediacaoControl"
+          placeholder="taxa de intermediação"
+        />%
+      </div>
+
+      <br />
+
+      <div>
+        <div>
+          <label for="taxaLicenca">Taxa de licensexclusiva</label>
+        </div>
+        R$<input
+          id="taxaLicenca"
+          type="number"
+          [formControl]="taxaLicencaControl"
+          placeholder="taxa de licença"
+        />
+      </div>
+
+      <br />
+
+      <div>
+        <div>
+          <label for="taxaPlayerUnico">Taxa de player unico</label>
+        </div>
+        R$<input
+          id="taxaPlayerUnico"
+          type="number"
+          [formControl]="taxaPlayerUnicoControl"
+          placeholder="player de pagamento único"
+        />
+      </div>
+    </fieldset>
+  </div>
+</div>
