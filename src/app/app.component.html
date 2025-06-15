@@ -4,6 +4,7 @@
   <div class="container">
     <div class="container-item">
       <fieldset>
+        <legend>Valores</legend>
         <div>
           <div>
             <label for="valorCobradoControl">Valor cobrado</label>
@@ -31,90 +32,99 @@
 
       <br />
 
-      <div>
-        Total a ser cobrado: {{ valorCobradoControl.value | currency : "BRL" }}
-      </div>
+      <fieldset class="container-item">
+        <legend>Taxas</legend>
+        <div>
+          <div>
+            <label for="taxaParcelamentoEm12x"
+              >Taxa de parcelamento em 12x</label
+            >
+          </div>
+          <input
+            id="taxaParcelamentoEm12x"
+            type="number"
+            [formControl]="taxaParcelamentoEm12xControl"
+          />%
+        </div>
 
-      <div>Total desconto: {{ valorDescontoControl.value }}%</div>
+        <br />
+
+        <div>
+          <div>
+            <label for="taxaIntermediacao">Taxa de intermediação</label>
+          </div>
+          <input
+            id="taxaIntermediacao"
+            type="number"
+            [formControl]="taxaIntermediacaoControl"
+            placeholder="taxa de intermediação"
+          />%
+        </div>
+
+        <br />
+
+        <div>
+          <div>
+            <label for="taxaLicenca">Taxa de licença exclusiva</label>
+          </div>
+          R$<input
+            id="taxaLicenca"
+            type="number"
+            [formControl]="taxaLicencaControl"
+            placeholder="taxa de licença"
+          />
+        </div>
+
+        <br />
+
+        <div>
+          <div>
+            <label for="taxaPlayerUnico">Taxa de player unico</label>
+          </div>
+          R$<input
+            id="taxaPlayerUnico"
+            type="number"
+            [formControl]="taxaPlayerUnicoControl"
+            placeholder="player de pagamento único"
+          />
+        </div>
+      </fieldset>
+      I
 
       <br />
 
       <div>
-        Total cobrado com desconto:
+        <strong>Total a ser cobrado:</strong>
+        {{ valorCobradoControl.value | currency : "BRL" }}
+      </div>
+
+      <div>
+        <strong>Total desconto:</strong> {{ valorDescontoControl.value }}%
+      </div>
+
+      <br />
+
+      <div>
+        <strong> Total cobrado com desconto: </strong>
         {{ valorCobradoMenosDesconto() | currency : "BRL" }}
       </div>
 
       <div>
-        Valor de cada parcela em 12x:
+        <strong> Valor de cada parcela em 12x: </strong>
         {{ valorDeCadaParcela() | currency : "BRL" }}
       </div>
 
       <br />
 
       <div>
-        Total líquido a receber à vista:
+        <strong> Total líquido a receber à vista: </strong>
         {{ valorLiquidoRecebidoAVista() | currency : "BRL" }}
       </div>
 
       <div>
-        Total líquido a receber parcelado em 12x:
+        <strong> Total líquido a receber parcelado em 12x: </strong>
         {{ valorLiquidoRecebidoEm12x() | currency : "BRL" }}
       </div>
     </div>
-
-    <fieldset class="container-item">
-      <div>
-        <div>
-          <label for="taxaParcelamentoEm12x">Taxa de parcelamento em 12x</label>
-        </div>
-        <input
-          id="taxaParcelamentoEm12x"
-          type="number"
-          [formControl]="taxaParcelamentoEm12xControl"
-        />%
-      </div>
-
-      <br />
-
-      <div>
-        <div>
-          <label for="taxaIntermediacao">Taxa de intermediação</label>
-        </div>
-        <input
-          id="taxaIntermediacao"
-          type="number"
-          [formControl]="taxaIntermediacaoControl"
-          placeholder="taxa de intermediação"
-        />%
-      </div>
-
-      <br />
-
-      <div>
-        <div>
-          <label for="taxaLicenca">Taxa de licensexclusiva</label>
-        </div>
-        R$<input
-          id="taxaLicenca"
-          type="number"
-          [formControl]="taxaLicencaControl"
-          placeholder="taxa de licença"
-        />
-      </div>
-
-      <br />
-
-      <div>
-        <div>
-          <label for="taxaPlayerUnico">Taxa de player unico</label>
-        </div>
-        R$<input
-          id="taxaPlayerUnico"
-          type="number"
-          [formControl]="taxaPlayerUnicoControl"
-          placeholder="player de pagamento único"
-        />
-      </div>
-    </fieldset>
   </div>
 </div>
