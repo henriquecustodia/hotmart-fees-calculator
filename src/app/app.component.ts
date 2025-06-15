@@ -8,11 +8,6 @@ import { debounce, debounceTime } from "rxjs";
   selector: "app-root",
   standalone: true,
   imports: [ReactiveFormsModule, CurrencyPipe],
-  styles: [
-    `
-
-    `
-  ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
@@ -25,7 +20,7 @@ export class AppComponent {
   valorCobradoControl = new FormControl(0, { nonNullable: true });
   valorDescontoControl = new FormControl(0, { nonNullable: true });
 
-  taxaParcelamentoEm12xControl = new FormControl(16.5, { nonNullable: true });
+  taxaParcelamentoEm12xControl = new FormControl(19.42366, { nonNullable: true });
   taxaIntermediacaoControl = new FormControl(9.9, { nonNullable: true });
   taxaLicencaControl = new FormControl(1, { nonNullable: true });
   taxaPlayerUnicoControl = new FormControl(2.49, { nonNullable: true });
@@ -34,6 +29,10 @@ export class AppComponent {
     [
       this.valorCobradoControl.valueChanges,
       this.valorDescontoControl.valueChanges,
+      this.taxaParcelamentoEm12xControl.valueChanges,
+      this.taxaIntermediacaoControl.valueChanges,
+      this.taxaLicencaControl.valueChanges,
+      this.taxaPlayerUnicoControl.valueChanges,
     ].forEach((changes) =>
       changes.pipe(debounceTime(500)).subscribe(() => {
         this.calcular();
