@@ -14,16 +14,25 @@ export class AppComponent {
     valorCobrado: 0,
     valorDesconto: 0,
     taxaAliquota: 6,
-    taxaParcelamentoEm12x: 19.42366,
+    taxaParcelamentoEm12x: 19.4253801641771,
     taxaIntermediacao: 9.9,
     taxaLicenca: 1,
     taxaPlayerUnico: 2.49,
+    clientePagaTaxaDeParcelamento: false,
   });
 
   form = form(this.model);
 
   valorParcelaEm12x = computed(() => {
-    return this.form().value().valorCobrado / 12;
+    let total = this.form().value().valorCobrado / 12;
+
+    if (this.form().value().clientePagaTaxaDeParcelamento) {
+      total *= this.form().value().taxaParcelamentoEm12x / 100 + 1;
+    }
+
+    total *= this.createDiscount(this.form().value().valorDesconto);
+
+    return total;
   });
 
   valorCobradoMenosDesconto = computed(() => {
@@ -42,7 +51,11 @@ export class AppComponent {
 
     const taxaParcelamentoEm12x = this.form().value().taxaParcelamentoEm12x;
 
-    total = total * this.createDiscount(taxaParcelamentoEm12x);
+    if (!this.form().value().clientePagaTaxaDeParcelamento) {
+      total = total * this.createDiscount(taxaParcelamentoEm12x);
+    }
+
+    total *= this.createDiscount(this.form().value().valorDesconto);
 
     total = this.calcularTaxasDaHotmart(total);
     total = this.calcularTaxaAliquota(total);
@@ -56,6 +69,8 @@ export class AppComponent {
     if (total <= 0) {
       return 0;
     }
+
+    total *= this.createDiscount(this.form().value().valorDesconto);
 
     total = this.calcularTaxasDaHotmart(total);
     total = this.calcularTaxaAliquota(total);

@@ -19,7 +19,7 @@
         </label>
       </div>
 
-      <div>
+      <div class="mt-2">
         <label class="label">Valor desconto</label>
         <label class="input">
           <input
@@ -30,6 +30,16 @@
           <div>%</div>
         </label>
       </div>
+
+      <label class="label mt-2">
+        <input
+          type="checkbox"
+          checkbox-xs
+          class="checkbox"
+          [formField]="form.clientePagaTaxaDeParcelamento"
+        />
+        Cliente paga taxa de parcelamento
+      </label>
     </fieldset>
 
     <fieldset
