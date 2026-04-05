@@ -1,130 +1,162 @@
-<div class="layout">
-  <h1>Precificar curso na Hotmart</h1>
+<div class="flex flex-col items-center mt-4">
+  <h1 class="text-2xl">Precificar curso na Hotmart</h1>
 
-  <div class="container">
-    <div class="container-item">
-      <fieldset>
-        <legend>Valores</legend>
-        <div>
-          <div>
-            <label for="valorCobradoControl">Valor cobrado</label>
-          </div>
-          R$<input
-            id="valorCobradoControl"
+  <div class="flex justify-around gap-4">
+    <fieldset
+      class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4"
+    >
+      <legend class="fieldset-legend">Valores</legend>
+
+      <div>
+        <label>Valor cobrado</label>
+        <label class="input">
+          <div>R$</div>
+          <input
             type="number"
-            [formControl]="valorCobradoControl"
+            [formField]="form.valorCobrado"
+            placeholder="Valor cobrado"
           />
-        </div>
+        </label>
+      </div>
 
-        <br />
-
-        <div>
-          <div>
-            <label for="valorDescontoControl">Valor desconto</label>
-          </div>
+      <div>
+        <label class="label">Valor desconto</label>
+        <label class="input">
           <input
-            id="valorDescontoControl"
             type="number"
-            [formControl]="valorDescontoControl"
-          />%
-        </div>
-      </fieldset>
+            [formField]="form.valorDesconto"
+            placeholder="Valor desconto"
+          />
+          <div>%</div>
+        </label>
+      </div>
+    </fieldset>
 
-      <br />
+    <fieldset
+      class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4"
+    >
+      <legend class="fieldset-legend">Impostos</legend>
 
-      <fieldset class="container-item">
-        <legend>Taxas</legend>
-        <div>
-          <div>
-            <label for="taxaParcelamentoEm12x"
-              >Taxa de parcelamento em 12x</label
-            >
-          </div>
+      <div>
+        <label class="label">Taxa de aliquota</label>
+        <label class="input">
           <input
-            id="taxaParcelamentoEm12x"
             type="number"
-            [formControl]="taxaParcelamentoEm12xControl"
-          />%
-        </div>
+            [formField]="form.taxaAliquota"
+            placeholder="Taxa de aliquota"
+          />
+          <div>%</div>
+        </label>
+      </div>
+    </fieldset>
 
-        <br />
+    <fieldset
+      class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4"
+    >
+      <legend class="fieldset-legend">Taxas da Hotmart</legend>
 
-        <div>
-          <div>
-            <label for="taxaIntermediacao">Taxa de intermediação</label>
-          </div>
+      <div>
+        <label class="label">Taxa de parcelamento em 12x</label>
+        <label class="input">
+          <input
+            type="number"
+            class=""
+            [formField]="form.taxaParcelamentoEm12x"
+            placeholder="taxa de parcelamento em 12x"
+          />
+          <div>%</div>
+        </label>
+      </div>
+
+      <div>
+        <label class="label">Taxa de intermediação</label>
+        <label class="input">
           <input
             id="taxaIntermediacao"
             type="number"
-            [formControl]="taxaIntermediacaoControl"
+            class=""
+            [formField]="form.taxaIntermediacao"
             placeholder="taxa de intermediação"
-          />%
-        </div>
-
-        <br />
-
-        <div>
-          <div>
-            <label for="taxaLicenca">Taxa de licença exclusiva</label>
-          </div>
-          R$<input
-            id="taxaLicenca"
-            type="number"
-            [formControl]="taxaLicencaControl"
-            placeholder="taxa de licença"
           />
-        </div>
+          <div>%</div>
+        </label>
+      </div>
 
-        <br />
+      <div>
+        <label class="label">Taxa de licença exclusiva</label>
+        <label class="input">
+          <input
+            type="number"
+            class=""
+            [formField]="form.taxaLicenca"
+            placeholder="taxa de licença exclusiva"
+          />
+          <div>%</div>
+        </label>
+      </div>
 
-        <div>
-          <div>
-            <label for="taxaPlayerUnico">Taxa de player unico</label>
-          </div>
-          R$<input
+      <div>
+        <label class="label">Taxa de player unico</label>
+        <label class="input">
+          <div>R$</div>
+          <input
             id="taxaPlayerUnico"
             type="number"
-            [formControl]="taxaPlayerUnicoControl"
-            placeholder="player de pagamento único"
+            [formField]="form.taxaPlayerUnico"
+            placeholder="Taxa de player unico"
+        /></label>
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="flex justify-around gap-4">
+    <fieldset
+      class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4"
+    >
+      <legend class="fieldset-legend">Valores cobrados</legend>
+
+      <div>
+        <label class="label">Total cobrado com desconto:</label>
+        <label class="input text-info">
+          <input
+            disabled
+            [value]="valorCobradoMenosDesconto() | currency: 'BRL'"
           />
-        </div>
-      </fieldset>
-      I
-
-      <br />
-
-      <div>
-        <strong>Total a ser cobrado:</strong>
-        {{ valorCobradoControl.value | currency : "BRL" }}
+        </label>
       </div>
 
       <div>
-        <strong>Total desconto:</strong> {{ valorDescontoControl.value }}%
+        <label class="label">Valor de cada parcela em 12x:</label>
+        <label class="input text-info">
+          <input disabled [value]="valorParcelaEm12x() | currency: 'BRL'" />
+        </label>
       </div>
+    </fieldset>
 
-      <br />
+    <fieldset
+      class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4"
+    >
+      <legend class="fieldset-legend">Valores líquidos a receber</legend>
 
       <div>
-        <strong> Total cobrado com desconto: </strong>
-        {{ valorCobradoMenosDesconto() | currency : "BRL" }}
+        <label class="label">À vista:</label>
+        <label class="input text-success">
+          <input
+            disabled
+            [value]="valorLiquidoRecebidoAVista() | currency: 'BRL'"
+          />
+        </label>
       </div>
 
       <div>
-        <strong> Valor de cada parcela em 12x: </strong>
-        {{ valorDeCadaParcela() | currency : "BRL" }}
+        <label class="label">Em 12x:</label>
+        <label class="input text-success">
+          <input
+            disabled
+            [value]="valorLiquidoRecebidoEm12x() | currency: 'BRL'"
+          />
+        </label>
       </div>
-
-      <br />
-
-      <div>
-        <strong> Total líquido a receber à vista: </strong>
-        {{ valorLiquidoRecebidoAVista() | currency : "BRL" }}
-      </div>
-
-      <div>
-        <strong> Total líquido a receber parcelado em 12x: </strong>
-        {{ valorLiquidoRecebidoEm12x() | currency : "BRL" }}
-      </div>
-    </div>
+    </fieldset>
   </div>
 </div>

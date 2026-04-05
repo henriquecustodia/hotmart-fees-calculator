@@ -1,91 +1,86 @@
 import { CurrencyPipe } from "@angular/common";
-import { Component, signal } from "@angular/core";
+import { Component, signal, computed } from "@angular/core";
 import { FormControl, FormGroup, ReactiveFormsModule } from "@angular/forms";
-import { RouterOutlet } from "@angular/router";
-import { debounce, debounceTime } from "rxjs";
-
+import { form, FormField } from "@angular/forms/signals";
+import { debounceTime } from "rxjs";
 @Component({
   selector: "app-root",
-  standalone: true,
-  imports: [ReactiveFormsModule, CurrencyPipe],
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+  imports: [ReactiveFormsModule, CurrencyPipe, FormField],
+  templateUrl: "./app.component.html",
+  styleUrls: ["./app.component.scss"],
 })
 export class AppComponent {
-  valorLiquidoRecebidoEm12x = signal(0);
-  valorLiquidoRecebidoAVista = signal(0);
-  valorDeCadaParcela = signal(0);
-  valorCobradoMenosDesconto = signal(0);
+  model = signal({
+    valorCobrado: 0,
+    valorDesconto: 0,
+    taxaAliquota: 6,
+    taxaParcelamentoEm12x: 19.42366,
+    taxaIntermediacao: 9.9,
+    taxaLicenca: 1,
+    taxaPlayerUnico: 2.49,
+  });
 
-  valorCobradoControl = new FormControl(0, { nonNullable: true });
-  valorDescontoControl = new FormControl(0, { nonNullable: true });
+  form = form(this.model);
 
-  taxaParcelamentoEm12xControl = new FormControl(19.42366, { nonNullable: true });
-  taxaIntermediacaoControl = new FormControl(9.9, { nonNullable: true });
-  taxaLicencaControl = new FormControl(1, { nonNullable: true });
-  taxaPlayerUnicoControl = new FormControl(2.49, { nonNullable: true });
+  valorParcelaEm12x = computed(() => {
+    return this.form().value().valorCobrado / 12;
+  });
 
-  constructor() {
-    [
-      this.valorCobradoControl.valueChanges,
-      this.valorDescontoControl.valueChanges,
-      this.taxaParcelamentoEm12xControl.valueChanges,
-      this.taxaIntermediacaoControl.valueChanges,
-      this.taxaLicencaControl.valueChanges,
-      this.taxaPlayerUnicoControl.valueChanges,
-    ].forEach((changes) =>
-      changes.pipe(debounceTime(500)).subscribe(() => {
-        this.calcular();
-      })
+  valorCobradoMenosDesconto = computed(() => {
+    return (
+      this.form().value().valorCobrado *
+      this.createDiscount(this.form().value().valorDesconto)
     );
-  }
+  });
 
-  calcular() {
-    let total = this.valorCobradoControl.value;
+  valorLiquidoRecebidoEm12x = computed(() => {
+    let total = this.form().value().valorCobrado;
 
-    const valorDescontoAVista = this.valorDescontoControl.value;
-
-    if (valorDescontoAVista > 0) {
-      total = total * (1 - valorDescontoAVista / 100);
+    if (total <= 0) {
+      return 0;
     }
 
-    this.valorCobradoMenosDesconto.set(total);
+    const taxaParcelamentoEm12x = this.form().value().taxaParcelamentoEm12x;
 
-    this.calcularParcelamentoEm12x(total);
-    this.calcularValorAVista(total);
-  }
-
-  calcularParcelamentoEm12x(valorCobrado: number) {
-    const taxaParcelamentoEm12x = this.taxaParcelamentoEm12xControl.value;
-    
-    this.valorDeCadaParcela.set(valorCobrado / 12);
-
-    let total = valorCobrado;
-
-    total = total * (1 - taxaParcelamentoEm12x / 100);
+    total = total * this.createDiscount(taxaParcelamentoEm12x);
 
     total = this.calcularTaxasDaHotmart(total);
+    total = this.calcularTaxaAliquota(total);
 
-    this.valorLiquidoRecebidoEm12x.set(total);
-  }
+    return total;
+  });
 
-  calcularValorAVista(valorCobrado: number) {
-    let total = valorCobrado;
+  valorLiquidoRecebidoAVista = computed(() => {
+    let total = this.form().value().valorCobrado;
+
+    if (total <= 0) {
+      return 0;
+    }
 
     total = this.calcularTaxasDaHotmart(total);
+    total = this.calcularTaxaAliquota(total);
 
-    this.valorLiquidoRecebidoAVista.set(total);
+    return total;
+  });
+
+  private calcularTaxaAliquota(valor: number) {
+    const taxaAliquota = this.form().value().taxaAliquota;
+    return valor * this.createDiscount(taxaAliquota);
   }
 
   private calcularTaxasDaHotmart(valor: number) {
-    const taxaIntermediacao = this.taxaIntermediacaoControl.value;
-    const taxaLicenca = this.taxaLicencaControl.value;
-    const taxaPlayerUnico = this.taxaPlayerUnicoControl.value;
+    const taxaIntermediacao = this.form().value().taxaIntermediacao;
+    const taxaLicenca = this.form().value().taxaLicenca;
+    const taxaPlayerUnico = this.form().value().taxaPlayerUnico;
 
     valor = valor * (1 - taxaIntermediacao / 100);
     valor = valor - taxaLicenca;
     valor = valor - taxaPlayerUnico;
 
     return valor;
+  }
+
+  private createDiscount(value: number) {
+    return 1 - value / 100;
   }
 }
